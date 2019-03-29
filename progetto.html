@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js - pointerlock controls</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			html, body {
+				width: 100%;
+				height: 100%;
+			}
+			body {
+				background-color: #ffffff;
+				margin: 0;
+				overflow: hidden;
+				font-family: arial;
+			}
+			#blocker {
+				position: absolute;
+				width: 100%;
+				height: 100%;
+				background-color: rgba(0,0,0,0.5);
+			}
+			#instructions {
+				width: 100%;
+				height: 100%;
+				display: -webkit-box;
+				display: -moz-box;
+				display: box;
+				-webkit-box-orient: horizontal;
+				-moz-box-orient: horizontal;
+				box-orient: horizontal;
+				-webkit-box-pack: center;
+				-moz-box-pack: center;
+				box-pack: center;
+				-webkit-box-align: center;
+				-moz-box-align: center;
+				box-align: center;
+				color: #ffffff;
+				text-align: center;
+				cursor: pointer;
+			}
+		</style>
+	</head>
+	<body>
+		<script src="lib/three.min.js"></script>
+		<script src="lib/PointerLockControls.js"></script>
+		<script src="lib/Reflector.js"></script>
+		<script src="lib/ReflectorRTT.js"></script>
+
+		<div id="blocker">
+
+			<div id="instructions">
+				<span style="font-size:40px">Click to play</span>
+				<br />
+				(W, A, S, D = Move, SPACE = Jump, MOUSE = Look around)
+			</div>
+
+		</div>
+
+		<script type="module">
+
+			import './lib/nodes/THREE.Nodes.js';
+			import './lib/NodeMaterialLoader.js';
+
+			const deg = Math.PI / 180;
+
+			var camera, scene, renderer, controls;
+			var objects = [];
+			var pivot;
+
+			var raycaster;
+			var moveForward = false;
+			var moveBackward = false;
+			var moveLeft = false;
+			var moveRight = false;
+			var canJump = false;
+			var prevTime = performance.now();
+			var velocity = new THREE.Vector3();
+			var direction = new THREE.Vector3();
+			var vertex = new THREE.Vector3();
+			var color = new THREE.Color();
+
+			var decalNormal = new THREE.TextureLoader().load( 'textures/decal/decal-normal.jpg' );
+			var decalDiffuse = new THREE.TextureLoader().load( 'textures/decal/decal-diffuse.png' );
+			decalDiffuse.wrapS = decalDiffuse.wrapT = THREE.RepeatWrapping;
+
+			var clock = new THREE.Clock();
+			var groundMirrorMaterial;
+			var frame = new THREE.NodeFrame();
+
+			init();
+			setGround();
+			animate();
+
+			function init() {
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x000000 );
+				scene.fog = new THREE.Fog( 0xffffff, 0, 750 );
+
+				// Lights
+				var light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 0.1 );
+				light.position.set( 0, 1, 0 );
+
+				var spotLight = new THREE.SpotLight( 0xaa5599 );
+				spotLight.position.set(100, 30, 0);
+				spotLight.castShadow = true;
+				spotLight.shadow.mapSize.width = 1024;
+				spotLight.shadow.mapSize.height = 1024;
+				spotLight.shadow.camera.near = 500;
+				spotLight.shadow.camera.far = 4000;
+				spotLight.shadow.camera.fov = 30;
+
+				var pointLight1 = new THREE.PointLight( 0xaaaaff );
+				pointLight1.position.set(0, 10, 0);
+
+				var pointLight2 = new THREE.PointLight( 0xaaaaff );
+				pointLight2.position.set(10, 30, -5);
+
+				var pointLight3 = new THREE.PointLight( 0xaaaaff );
+				pointLight3.position.set(-20, 20, 14);
+
+				scene.add( light, spotLight, pointLight1, pointLight2, pointLight3 );
+
+				controls = new THREE.PointerLockControls( camera );
+
+				// Instructions
+				var blocker = document.getElementById( 'blocker' );
+				var instructions = document.getElementById( 'instructions' );
+
+				instructions.addEventListener( 'click', function () {
+					controls.lock();
+				}, false );
+
+				controls.addEventListener( 'lock', function () {
+					instructions.style.display = 'none';
+					blocker.style.display = 'none';
+				} );
+
+				controls.addEventListener( 'unlock', function () {
+					blocker.style.display = 'block';
+					instructions.style.display = '';
+				} );
+
+				scene.add( controls.getObject() );
+
+				var onKeyDown = function ( event ) {
+					switch ( event.keyCode ) {
+						case 38: // up
+						case 87: // w
+							moveForward = true;
+							break;
+						case 37: // left
+						case 65: // a
+							moveLeft = true;
+							break;
+						case 40: // down
+						case 83: // s
+							moveBackward = true;
+							break;
+						case 39: // right
+						case 68: // d
+							moveRight = true;
+							break;
+						case 32: // space
+							if ( canJump === true ) velocity.y += 350;
+							canJump = false;
+							break;
+					}
+				};
+
+				var onKeyUp = function ( event ) {
+					switch ( event.keyCode ) {
+						case 38: // up
+						case 87: // w
+							moveForward = false;
+							break;
+						case 37: // left
+						case 65: // a
+							moveLeft = false;
+							break;
+						case 40: // down
+						case 83: // s
+							moveBackward = false;
+							break;
+						case 39: // right
+						case 68: // d
+							moveRight = false;
+							break;
+					}
+				};
+
+				document.addEventListener( 'keydown', onKeyDown, false );
+				document.addEventListener( 'keyup', onKeyUp, false );
+
+				raycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 10 );
+
+				// objects
+				var boxGeometry = new THREE.BoxBufferGeometry( 10, 10, 10 );
+				boxGeometry = boxGeometry.toNonIndexed(); // ensure each face has unique vertices
+				var position = boxGeometry.attributes.position;
+
+				var colors = [];
+				for ( var i = 0, l = position.count; i < l; i ++ ) {
+					color.setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
+					colors.push( color.r, color.g, color.b );
+				}
+
+				boxGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+				var boxMaterial = new THREE.MeshPhysicalMaterial({
+					map: null,
+					color: 0x0000ff,
+					metalness: 0.5,
+					roughness: 0.15,
+					opacity: 0.15,
+					side: THREE.FrontSide,
+					transparent: true,
+					envMapIntensity: 5,
+					premultipliedAlpha: true,
+				});
+
+				pivot = new THREE.Object3D();
+
+				for ( var i = 0; i < 500; i ++ ) {
+					boxMaterial.color.setHSL( Math.random() * 0.2 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
+					var box = new THREE.Mesh( boxGeometry, boxMaterial );
+
+					let random = Math.random();
+					box.position.x = Math.floor( Math.random() * 20 - 10 ) * 20;
+					box.position.y = Math.floor( Math.random() * 20 ) * 10 + 20;
+					box.position.z = Math.floor( Math.random() * 20 - 10 ) * 20;
+					box.scale.set(random, random, random);
+					box.rotation.x = Math.random();
+					box.rotation.y = Math.random();
+					box.rotation.z = Math.random();
+					pivot.add( box );
+					objects.push( box );
+				}
+
+				scene.add( pivot );
+
+				let prova = new THREE.Mesh(boxGeometry, new THREE.MeshBasicMaterial({ color: 0xd9e8a1 }));
+				scene.add(prova);
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+				
+				window.addEventListener( 'resize', onWindowResize, false );
+			}
+
+			function setGround() {
+				var planeGeo = new THREE.PlaneBufferGeometry( 100.1, 100.1 );
+
+				// reflector/mirror plane
+				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				var groundMirror = new THREE.ReflectorRTT( geometry, { clipBias: 0.003, textureWidth: window.innerWidth, textureHeight: window.innerHeight } );
+
+				var mask = new THREE.SwitchNode( new THREE.TextureNode( decalDiffuse ), 'w' );
+
+				var mirror = new THREE.ReflectorNode( groundMirror );
+
+				var normalMap = new THREE.TextureNode( decalNormal );
+				var normalXY = new THREE.SwitchNode( normalMap, 'xy' );
+				var normalXYFlip = new THREE.Math1Node(
+					normalXY,
+					THREE.Math1Node.INVERT
+				);
+
+				var offsetNormal = new THREE.OperatorNode(
+					normalXYFlip,
+					new THREE.FloatNode( .5 ),
+					THREE.OperatorNode.SUB
+				);
+
+				mirror.offset = new THREE.OperatorNode(
+					offsetNormal, // normal
+					new THREE.FloatNode( 6 ), // scale
+					THREE.OperatorNode.MUL
+				);
+
+				var blurMirror = new THREE.BlurNode( mirror );
+				blurMirror.size = new THREE.Vector2( window.innerWidth, window.innerHeight );
+				blurMirror.uv = new THREE.ExpressionNode( "projCoord.xyz / projCoord.q", "vec3" );
+				blurMirror.uv.keywords[ "projCoord" ] = new THREE.OperatorNode( mirror.offset, mirror.uv, THREE.OperatorNode.ADD );
+				blurMirror.radius.x = blurMirror.radius.y = 0;
+
+				groundMirrorMaterial = new THREE.PhongNodeMaterial();
+				groundMirrorMaterial.environment = blurMirror; // or add "mirror" variable to disable blur
+				groundMirrorMaterial.environmentAlpha = mask;
+				groundMirrorMaterial.normal = new THREE.NormalMapNode( normalMap );
+				//groundMirrorMaterial.normalScale = new THREE.FloatNode( 1 );
+
+				var mirrorMesh = new THREE.Mesh( planeGeo, groundMirrorMaterial );
+				// add all alternative mirror materials inside the ReflectorRTT to prevent:
+				// glDrawElements: Source and destination textures of the draw are the same.
+				groundMirror.add( mirrorMesh );
+				groundMirror.rotateX( - Math.PI / 2 );
+				scene.add( groundMirror );
+
+			}
+
+			function onWindowResize() {
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				if ( controls.isLocked === true ) {
+					raycaster.ray.origin.copy( controls.getObject().position );
+					raycaster.ray.origin.y -= 10;
+
+					var intersections = raycaster.intersectObjects( objects );
+					var onObject = intersections.length > 0;
+					var time = performance.now();
+
+					var delta = ( time - prevTime ) / 1000;
+					velocity.x -= velocity.x * 10.0 * delta;
+					velocity.z -= velocity.z * 10.0 * delta;
+					velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
+
+					direction.z = Number( moveForward ) - Number( moveBackward );
+					direction.x = Number( moveLeft ) - Number( moveRight );
+					direction.normalize(); // this ensures consistent movements in all directions
+
+					if ( moveForward || moveBackward ) velocity.z -= direction.z * 400.0 * delta;
+					if ( moveLeft || moveRight ) velocity.x -= direction.x * 400.0 * delta;
+
+					if ( onObject === true ) {
+						velocity.y = Math.max( 0, velocity.y );
+						canJump = true;
+					}
+
+					controls.getObject().translateX( velocity.x * delta );
+					controls.getObject().translateY( velocity.y * delta );
+					controls.getObject().translateZ( velocity.z * delta );
+
+					if ( controls.getObject().position.y < 10 ) {
+						velocity.y = 0;
+						controls.getObject().position.y = 10;
+						canJump = true;
+					}
+
+					prevTime = time;
+				}
+
+				var delta = clock.getDelta();
+				var timer = Date.now() * 0.001;
+
+				pivot.rotateY(0.1 * deg);
+
+				objects.map((obj) => {
+					obj.rotateY(0.2 * deg);
+					obj.rotateX(0.1 * deg);
+					obj.rotateZ(0.1 * deg);
+				});
+
+				frame.update( delta ).updateNode( groundMirrorMaterial );
+				render();
+			}
+
+			function render() {
+				renderer.clearTarget();
+				renderer.render( scene, camera );
+			}
+
+			//return array with height data from img, taken from: http://danni-three.blogspot.it/2013/09/threejs-heightmaps.html
+			function getHeightData(img,scale) {
+	  
+			 if (scale == undefined) scale=1;
+	  
+			    var canvas = document.createElement( 'canvas' );
+			    canvas.width = img.width;
+			    canvas.height = img.height;
+			    var context = canvas.getContext( '2d' );
+	 
+			    var size = img.width * img.height;
+				console.log(size);
+			    var data = new Float32Array( size );
+	 
+			    context.drawImage(img,0,0);
+	 
+			    for ( var i = 0; i < size; i ++ ) {
+			        data[i] = 0
+			    }
+	 
+			    var imgd = context.getImageData(0, 0, img.width, img.height);
+			    var pix = imgd.data;
+	 
+			    var j=0;
+			    for (var i = 0; i<pix.length; i +=4) {
+			        var all = pix[i]+pix[i+1]+pix[i+2];  // all is in range 0 - 255*3
+			        data[j++] = scale*all/3;   
+			    }
+	     
+			    return data;
+			}
+		</script>
+	</body>
+</html>
