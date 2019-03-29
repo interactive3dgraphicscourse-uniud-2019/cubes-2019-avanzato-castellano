@@ -64,10 +64,12 @@
 			import './lib/NodeMaterialLoader.js';
 
 			const deg = Math.PI / 180;
+			const borderLimits = 10;
 
 			var camera, scene, renderer, controls;
 			var objects = [];
-			var pivot;
+			var pivot, terrain;
+			var img;
 
 			var raycaster;
 			var moveForward = false;
@@ -221,27 +223,25 @@
 				});
 
 				pivot = new THREE.Object3D();
+				var box = new THREE.Mesh( boxGeometry, boxMaterial );
 
 				for ( var i = 0; i < 500; i ++ ) {
 					boxMaterial.color.setHSL( Math.random() * 0.2 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-					var box = new THREE.Mesh( boxGeometry, boxMaterial );
+					let object = box.clone();
 
 					let random = Math.random();
-					box.position.x = Math.floor( Math.random() * 20 - 10 ) * 20;
-					box.position.y = Math.floor( Math.random() * 20 ) * 10 + 20;
-					box.position.z = Math.floor( Math.random() * 20 - 10 ) * 20;
-					box.scale.set(random, random, random);
-					box.rotation.x = Math.random();
-					box.rotation.y = Math.random();
-					box.rotation.z = Math.random();
-					pivot.add( box );
-					objects.push( box );
+					object.position.x = Math.floor( Math.random() * 20 - 10 ) * 20;
+					object.position.y = Math.floor( Math.random() * 20 ) * 10 + 20;
+					object.position.z = Math.floor( Math.random() * 20 - 10 ) * 20;
+					object.scale.set(random, random, random);
+					object.rotation.x = Math.random();
+					object.rotation.y = Math.random();
+					object.rotation.z = Math.random();
+					pivot.add( object );
+					objects.push( object );
 				}
 
 				scene.add( pivot );
-
-				let prova = new THREE.Mesh(boxGeometry, new THREE.MeshBasicMaterial({ color: 0xd9e8a1 }));
-				scene.add(prova);
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -252,53 +252,96 @@
 			}
 
 			function setGround() {
-				var planeGeo = new THREE.PlaneBufferGeometry( 100.1, 100.1 );
+				// terrain
+				terrain = new THREE.Object3D();
 
-				// reflector/mirror plane
-				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
-				var groundMirror = new THREE.ReflectorRTT( geometry, { clipBias: 0.003, textureWidth: window.innerWidth, textureHeight: window.innerHeight } );
+				img = new Image();
+				img.src = "textures/heightmap.png";
 
-				var mask = new THREE.SwitchNode( new THREE.TextureNode( decalDiffuse ), 'w' );
+				img.onload = function () {
+	  
+					//get height data from img
+					var data = getHeightData(img,0.1);
 
-				var mirror = new THREE.ReflectorNode( groundMirror );
+					let count = 0;
+					var boxGeometry = new THREE.BoxBufferGeometry( 10, 10, 10 );
+					let groundMaterial = new THREE.MeshPhysicalMaterial({
+						color: 0xbbaaf0,
+						metalness: 0.5,
+						roughness: 0.15,
+						opacity: 0.3,
+						transparent: true,
+						side: THREE.FrontSide,
+					});
+					let box = new THREE.Mesh( boxGeometry, groundMaterial);
+					box.name = "terrain";
 
-				var normalMap = new THREE.TextureNode( decalNormal );
-				var normalXY = new THREE.SwitchNode( normalMap, 'xy' );
-				var normalXYFlip = new THREE.Math1Node(
-					normalXY,
-					THREE.Math1Node.INVERT
-				);
+					for (var i = 0; i < img.width; i++) {
+						for (var j = 0; j < img.height; j++) {
+							let object = box.clone();
+							object.position.x = ( i - img.width / 2 ) * 10;
+							object.position.z = ( j - img.height / 2 ) * 10;
+							object.position.y = data[count] * 1.5;
+							count++;
+							objects.push(object);
+							terrain.add(object);
+						}
+					}
 
-				var offsetNormal = new THREE.OperatorNode(
-					normalXYFlip,
-					new THREE.FloatNode( .5 ),
-					THREE.OperatorNode.SUB
-				);
+					scene.add(terrain);
 
-				mirror.offset = new THREE.OperatorNode(
-					offsetNormal, // normal
-					new THREE.FloatNode( 6 ), // scale
-					THREE.OperatorNode.MUL
-				);
+					/*
+					var planeGeo = new THREE.PlaneBufferGeometry( 100.1, 100.1 );
 
-				var blurMirror = new THREE.BlurNode( mirror );
-				blurMirror.size = new THREE.Vector2( window.innerWidth, window.innerHeight );
-				blurMirror.uv = new THREE.ExpressionNode( "projCoord.xyz / projCoord.q", "vec3" );
-				blurMirror.uv.keywords[ "projCoord" ] = new THREE.OperatorNode( mirror.offset, mirror.uv, THREE.OperatorNode.ADD );
-				blurMirror.radius.x = blurMirror.radius.y = 0;
+					// reflector/mirror plane
+					var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
+					var groundMirror = new THREE.ReflectorRTT( geometry, { clipBias: 0.003, textureWidth: window.innerWidth, textureHeight: window.innerHeight } );
 
-				groundMirrorMaterial = new THREE.PhongNodeMaterial();
-				groundMirrorMaterial.environment = blurMirror; // or add "mirror" variable to disable blur
-				groundMirrorMaterial.environmentAlpha = mask;
-				groundMirrorMaterial.normal = new THREE.NormalMapNode( normalMap );
-				//groundMirrorMaterial.normalScale = new THREE.FloatNode( 1 );
+					var mask = new THREE.SwitchNode( new THREE.TextureNode( decalDiffuse ), 'w' );
 
-				var mirrorMesh = new THREE.Mesh( planeGeo, groundMirrorMaterial );
-				// add all alternative mirror materials inside the ReflectorRTT to prevent:
-				// glDrawElements: Source and destination textures of the draw are the same.
-				groundMirror.add( mirrorMesh );
-				groundMirror.rotateX( - Math.PI / 2 );
-				scene.add( groundMirror );
+					var mirror = new THREE.ReflectorNode( groundMirror );
+
+					var normalMap = new THREE.TextureNode( decalNormal );
+					var normalXY = new THREE.SwitchNode( normalMap, 'xy' );
+					var normalXYFlip = new THREE.Math1Node(
+						normalXY,
+						THREE.Math1Node.INVERT
+					);
+
+					var offsetNormal = new THREE.OperatorNode(
+						normalXYFlip,
+						new THREE.FloatNode( .5 ),
+						THREE.OperatorNode.SUB
+					);
+
+					mirror.offset = new THREE.OperatorNode(
+						offsetNormal, // normal
+						new THREE.FloatNode( 6 ), // scale
+						THREE.OperatorNode.MUL
+					);
+
+					var blurMirror = new THREE.BlurNode( mirror );
+					blurMirror.size = new THREE.Vector2( window.innerWidth, window.innerHeight );
+					blurMirror.uv = new THREE.ExpressionNode( "projCoord.xyz / projCoord.q", "vec3" );
+					blurMirror.uv.keywords[ "projCoord" ] = new THREE.OperatorNode( mirror.offset, mirror.uv, THREE.OperatorNode.ADD );
+					blurMirror.radius.x = blurMirror.radius.y = 0;
+
+					groundMirrorMaterial = new THREE.PhongNodeMaterial();
+					groundMirrorMaterial.environment = blurMirror; // or add "mirror" variable to disable blur
+					groundMirrorMaterial.environmentAlpha = mask;
+					groundMirrorMaterial.normal = new THREE.NormalMapNode( normalMap );
+					//groundMirrorMaterial.normalScale = new THREE.FloatNode( 1 );
+
+					var mirrorMesh = new THREE.Mesh( planeGeo, groundMirrorMaterial );
+					// add all alternative mirror materials inside the ReflectorRTT to prevent:
+					// glDrawElements: Source and destination textures of the draw are the same.
+					groundMirror.add( mirrorMesh );
+					groundMirror.rotateX( - Math.PI / 2 );
+					groundMirror.position.y = 10;
+					scene.add( groundMirror );
+					*/
+
+				}
 
 			}
 
@@ -341,10 +384,29 @@
 					controls.getObject().translateY( velocity.y * delta );
 					controls.getObject().translateZ( velocity.z * delta );
 
-					if ( controls.getObject().position.y < 10 ) {
+					if ( controls.getObject().position.y < 0 ) {
 						velocity.y = 0;
-						controls.getObject().position.y = 10;
+						controls.getObject().position.y = 0;
 						canJump = true;
+					}
+
+					let z = controls.getObject().position.z;
+					let x = controls.getObject().position.x;
+
+					if ( z >= (img.height * 5) - borderLimits ) {
+						controls.getObject().position.z = (img.height * 5) - borderLimits;
+					}
+
+					if ( z <= (- img.height * 5) + borderLimits ) {
+						controls.getObject().position.z = (- img.height * 5) + borderLimits;
+					}
+
+					if ( x >= (img.width * 5) - borderLimits ) {
+						controls.getObject().position.x = (img.width * 5) - borderLimits;
+					}
+
+					if ( x <= (- img.width * 5) + borderLimits ) {
+						controls.getObject().position.x = (- img.width * 5) + borderLimits;
 					}
 
 					prevTime = time;
@@ -356,12 +418,14 @@
 				pivot.rotateY(0.1 * deg);
 
 				objects.map((obj) => {
-					obj.rotateY(0.2 * deg);
-					obj.rotateX(0.1 * deg);
-					obj.rotateZ(0.1 * deg);
+					if (obj.name != "terrain") {
+						obj.rotateY(0.2 * deg);
+						obj.rotateX(0.1 * deg);
+						obj.rotateZ(0.1 * deg);
+					}
 				});
 
-				frame.update( delta ).updateNode( groundMirrorMaterial );
+				//frame.update( delta ).updateNode( groundMirrorMaterial );
 				render();
 			}
 
