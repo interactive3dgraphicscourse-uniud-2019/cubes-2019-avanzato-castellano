@@ -44,6 +44,7 @@
 	</head>
 	<body>
 		<script src="lib/three.min.js"></script>
+		<script src="lib/stats.min.js"></script>
 		<script src="lib/PointerLockControls.js"></script>
 		<script src="lib/Reflector.js"></script>
 		<script src="lib/ReflectorRTT.js"></script>
@@ -60,16 +61,18 @@
 
 		<script type="module">
 
-			import './lib/nodes/THREE.Nodes.js';
-			import './lib/NodeMaterialLoader.js';
+			//import './lib/nodes/THREE.Nodes.js';
+			//import './lib/NodeMaterialLoader.js';
 
 			const deg = Math.PI / 180;
 			const borderLimits = 10;
 
-			var camera, scene, renderer, controls;
-			var objects = [];
+			var camera, scene, renderer, controls, stats;
 			var pivot, terrain;
 			var img;
+
+			var objects = [];
+			var clock = new THREE.Clock();
 
 			var raycaster;
 			var moveForward = false;
@@ -83,19 +86,21 @@
 			var vertex = new THREE.Vector3();
 			var color = new THREE.Color();
 
+			/*
 			var decalNormal = new THREE.TextureLoader().load( 'textures/decal/decal-normal.jpg' );
 			var decalDiffuse = new THREE.TextureLoader().load( 'textures/decal/decal-diffuse.png' );
 			decalDiffuse.wrapS = decalDiffuse.wrapT = THREE.RepeatWrapping;
 
-			var clock = new THREE.Clock();
 			var groundMirrorMaterial;
 			var frame = new THREE.NodeFrame();
+			*/
 
 			init();
 			setGround();
 			animate();
 
 			function init() {
+				stats = new Stats();
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x000000 );
@@ -247,6 +252,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
+				document.body.appendChild( stats.domElement );
 				
 				window.addEventListener( 'resize', onWindowResize, false );
 			}
@@ -289,59 +295,58 @@
 					}
 
 					scene.add(terrain);
-
-					/*
-					var planeGeo = new THREE.PlaneBufferGeometry( 100.1, 100.1 );
-
-					// reflector/mirror plane
-					var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
-					var groundMirror = new THREE.ReflectorRTT( geometry, { clipBias: 0.003, textureWidth: window.innerWidth, textureHeight: window.innerHeight } );
-
-					var mask = new THREE.SwitchNode( new THREE.TextureNode( decalDiffuse ), 'w' );
-
-					var mirror = new THREE.ReflectorNode( groundMirror );
-
-					var normalMap = new THREE.TextureNode( decalNormal );
-					var normalXY = new THREE.SwitchNode( normalMap, 'xy' );
-					var normalXYFlip = new THREE.Math1Node(
-						normalXY,
-						THREE.Math1Node.INVERT
-					);
-
-					var offsetNormal = new THREE.OperatorNode(
-						normalXYFlip,
-						new THREE.FloatNode( .5 ),
-						THREE.OperatorNode.SUB
-					);
-
-					mirror.offset = new THREE.OperatorNode(
-						offsetNormal, // normal
-						new THREE.FloatNode( 6 ), // scale
-						THREE.OperatorNode.MUL
-					);
-
-					var blurMirror = new THREE.BlurNode( mirror );
-					blurMirror.size = new THREE.Vector2( window.innerWidth, window.innerHeight );
-					blurMirror.uv = new THREE.ExpressionNode( "projCoord.xyz / projCoord.q", "vec3" );
-					blurMirror.uv.keywords[ "projCoord" ] = new THREE.OperatorNode( mirror.offset, mirror.uv, THREE.OperatorNode.ADD );
-					blurMirror.radius.x = blurMirror.radius.y = 0;
-
-					groundMirrorMaterial = new THREE.PhongNodeMaterial();
-					groundMirrorMaterial.environment = blurMirror; // or add "mirror" variable to disable blur
-					groundMirrorMaterial.environmentAlpha = mask;
-					groundMirrorMaterial.normal = new THREE.NormalMapNode( normalMap );
-					//groundMirrorMaterial.normalScale = new THREE.FloatNode( 1 );
-
-					var mirrorMesh = new THREE.Mesh( planeGeo, groundMirrorMaterial );
-					// add all alternative mirror materials inside the ReflectorRTT to prevent:
-					// glDrawElements: Source and destination textures of the draw are the same.
-					groundMirror.add( mirrorMesh );
-					groundMirror.rotateX( - Math.PI / 2 );
-					groundMirror.position.y = 10;
-					scene.add( groundMirror );
-					*/
-
 				}
+
+				/*
+				var planeGeo = new THREE.PlaneBufferGeometry( 100.1, 100.1 );
+
+				// reflector/mirror plane
+				var geometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				var groundMirror = new THREE.ReflectorRTT( geometry, { clipBias: 0.003, textureWidth: window.innerWidth, textureHeight: window.innerHeight } );
+
+				var mask = new THREE.SwitchNode( new THREE.TextureNode( decalDiffuse ), 'w' );
+
+				var mirror = new THREE.ReflectorNode( groundMirror );
+
+				var normalMap = new THREE.TextureNode( decalNormal );
+				var normalXY = new THREE.SwitchNode( normalMap, 'xy' );
+				var normalXYFlip = new THREE.Math1Node(
+					normalXY,
+					THREE.Math1Node.INVERT
+				);
+
+				var offsetNormal = new THREE.OperatorNode(
+					normalXYFlip,
+					new THREE.FloatNode( .5 ),
+					THREE.OperatorNode.SUB
+				);
+
+				mirror.offset = new THREE.OperatorNode(
+					offsetNormal, // normal
+					new THREE.FloatNode( 6 ), // scale
+					THREE.OperatorNode.MUL
+				);
+
+				var blurMirror = new THREE.BlurNode( mirror );
+				blurMirror.size = new THREE.Vector2( window.innerWidth, window.innerHeight );
+				blurMirror.uv = new THREE.ExpressionNode( "projCoord.xyz / projCoord.q", "vec3" );
+				blurMirror.uv.keywords[ "projCoord" ] = new THREE.OperatorNode( mirror.offset, mirror.uv, THREE.OperatorNode.ADD );
+				blurMirror.radius.x = blurMirror.radius.y = 0;
+
+				groundMirrorMaterial = new THREE.PhongNodeMaterial();
+				groundMirrorMaterial.environment = blurMirror; // or add "mirror" variable to disable blur
+				groundMirrorMaterial.environmentAlpha = mask;
+				groundMirrorMaterial.normal = new THREE.NormalMapNode( normalMap );
+				//groundMirrorMaterial.normalScale = new THREE.FloatNode( 1 );
+
+				var mirrorMesh = new THREE.Mesh( planeGeo, groundMirrorMaterial );
+				// add all alternative mirror materials inside the ReflectorRTT to prevent:
+				// glDrawElements: Source and destination textures of the draw are the same.
+				groundMirror.add( mirrorMesh );
+				groundMirror.rotateX( - Math.PI / 2 );
+				groundMirror.position.y = 10;
+				scene.add( groundMirror );
+				*/
 
 			}
 
@@ -390,6 +395,7 @@
 						canJump = true;
 					}
 
+					// Terrain limit borders check
 					let z = controls.getObject().position.z;
 					let x = controls.getObject().position.x;
 
@@ -426,11 +432,12 @@
 				});
 
 				//frame.update( delta ).updateNode( groundMirrorMaterial );
+				stats.update();
 				render();
 			}
 
 			function render() {
-				renderer.clearTarget();
+				//renderer.clearTarget();
 				renderer.render( scene, camera );
 			}
 
