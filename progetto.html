@@ -90,7 +90,8 @@
 			var crystalTexture = new THREE.TextureLoader().load( 'textures/crystal.jpg' );
 
 			/*
-			var decalNormal = new THREE.TextureLoader().load( 'textures/decal/decal-normal.jpg' );
+			var decalNormal
+			 = new THREE.TextureLoader().load( 'textures/decal/decal-normal.jpg' );
 			var decalDiffuse = new THREE.TextureLoader().load( 'textures/decal/decal-diffuse.png' );
 			decalDiffuse.wrapS = decalDiffuse.wrapT = THREE.RepeatWrapping;
 
@@ -108,12 +109,14 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x000000 );
 				scene.fog = new THREE.Fog( 0xffffff, 0, 750 );
-
+ 
 				// Lights
-				var light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 0.1 );
+ 				var light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 0.1 );
 				light.position.set( 0, 1, 0 );
 
 				var spotLight = new THREE.SpotLight( 0xaa5599 );
+				spotLight.intensity = 2;	
+				spotLight.distance = 300;
 				spotLight.position.set(100, 30, 10);
 				spotLight.castShadow = true;
 				spotLight.shadow.mapSize.width = 1024;
@@ -121,7 +124,7 @@
 				spotLight.shadow.camera.near = 500;
 				spotLight.shadow.camera.far = 4000;
 				spotLight.shadow.camera.fov = 30;
-
+/*
 				var pointLight1 = new THREE.PointLight( 0xaaaaff );
 				pointLight1.position.set(0, 20, 0);
 
@@ -129,10 +132,10 @@
 				pointLight2.position.set(10, 30, -5);
 
 				var pointLight3 = new THREE.PointLight( 0xaaaaff );
-				pointLight3.position.set(-20, 20, 14);
+				pointLight3.position.set(-20, 20, 14);*/
 
-				scene.add( light, spotLight, pointLight1, pointLight2, pointLight3 );
-
+				//scene.add( light, spotLight, pointLight1, pointLight2, pointLight3 ); 
+				scene.add(light, spotLight);
 				controls = new THREE.PointerLockControls( camera );
 
 				// Instructions
@@ -247,29 +250,38 @@
 
 				// heart
 				var heartMaterial = new THREE.MeshPhysicalMaterial({
-					color: 0xff22aa,
+					emissive: 0xff22aa,
 					metalness: 0.0,
 					roughness: 0.15,
-					opacity: 1,
+					opacity: 0.8,
 					side: THREE.FrontSide,
 					transparent: false,
+					map: crystalTexture,
+					envMap: crystalTexture
 				});
-
+				
 				heart = new THREE.Object3D();
 				box = new THREE.Mesh( boxGeometry, heartMaterial );
-				box.position.y = 50;
+				box.position.y = 0;
+				box.name = "stairs";
 
-				for (var i = 1; i < 10; i++) {
-					for (var j = 0; j < i; j++) {
-						let object = box.clone();
-						object.position.y += i * 10; 
-						object.position.x = Math.sin(j) * 20;
-						object.position.z = Math.cos(j) * 20;
-						//let scalingValue = i / 5;
-						//object.scale.set(scalingValue, scalingValue, scalingValue);
-						heart.add(object);
-					}
+				for (var i = 1; i < 100; i++) {
+					let object = box.clone();
+					object.position.y += i * 2; 
+					object.position.x = Math.sin(i/5) * 20;
+					object.position.z = Math.cos(i/5) * 20;
+					object.scale.set(1, 0.2 , 1.5);  
+					object.rotation.y = i/5;
+					objects.push(object);
+					heart.add(object);
 				}
+
+
+				// lights
+				var mainLight = new THREE.PointLight( 0xcccccc, 1.5, 250 );
+				mainLight.position.y = 20;
+				mainLight.intensity = 0.8;
+				heart.add( mainLight );
 
 				pivot.add( heart );
 				scene.add( pivot );
@@ -298,10 +310,11 @@
 					let count = 0;
 					var boxGeometry = new THREE.BoxBufferGeometry( 10, 10, 10 );
 					let groundMaterial = new THREE.MeshPhysicalMaterial({
+						reflectivity: 1,
 						color: 0xbbaaf0,
-						metalness: 0.5,
-						roughness: 0.15,
-						opacity: 0.3,
+						metalness: 1,
+						roughness: 0.5,
+						opacity: 0.9,
 						transparent: true,
 						side: THREE.FrontSide,
 						map: groundTexture,
@@ -451,7 +464,7 @@
 				pivot.rotateY(0.1 * deg);
 
 				objects.map((obj) => {
-					if (obj.name != "terrain") {
+					if (obj.name != "terrain" && obj.name != "stairs") {
 						obj.rotateY(0.2 * deg);
 						obj.rotateX(0.1 * deg);
 						obj.rotateZ(0.1 * deg);
