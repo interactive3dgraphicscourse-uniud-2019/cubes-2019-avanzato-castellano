@@ -68,7 +68,7 @@
 			const borderLimits = 10;
 
 			var camera, scene, renderer, controls, stats;
-			var pivot, terrain;
+			var pivot, terrain, heart;
 			var img;
 
 			var objects = [];
@@ -211,13 +211,7 @@
 				boxGeometry = boxGeometry.toNonIndexed(); // ensure each face has unique vertices
 				var position = boxGeometry.attributes.position;
 
-				var colors = [];
-				for ( var i = 0, l = position.count; i < l; i ++ ) {
-					color.setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-					colors.push( color.r, color.g, color.b );
-				}
-
-				boxGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+				// random cubes
 				var boxMaterial = new THREE.MeshPhysicalMaterial({
 					map: null,
 					color: 0x0000ff,
@@ -235,13 +229,13 @@
 				pivot = new THREE.Object3D();
 				var box = new THREE.Mesh( boxGeometry, boxMaterial );
 
-				for ( var i = 0; i < 500; i ++ ) {
+				for ( var i = 0; i < 200; i ++ ) {
 					boxMaterial.color.setHSL( Math.random() * 0.2 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
 					let object = box.clone();
 
 					let random = Math.random();
 					object.position.x = Math.floor( Math.random() * 20 - 10 ) * 20;
-					object.position.y = Math.floor( Math.random() * 20 ) * 10 + 20;
+					object.position.y = Math.floor( Math.random() * 80 ) + 40;
 					object.position.z = Math.floor( Math.random() * 20 - 10 ) * 20;
 					object.scale.set(random, random, random);
 					object.rotation.x = Math.random();
@@ -251,6 +245,33 @@
 					objects.push( object );
 				}
 
+				// heart
+				var heartMaterial = new THREE.MeshPhysicalMaterial({
+					color: 0xff22aa,
+					metalness: 0.0,
+					roughness: 0.15,
+					opacity: 1,
+					side: THREE.FrontSide,
+					transparent: false,
+				});
+
+				heart = new THREE.Object3D();
+				box = new THREE.Mesh( boxGeometry, heartMaterial );
+				box.position.y = 50;
+
+				for (var i = 1; i < 10; i++) {
+					for (var j = 0; j < i; j++) {
+						let object = box.clone();
+						object.position.y += i * 10; 
+						object.position.x = Math.sin(j) * 20;
+						object.position.z = Math.cos(j) * 20;
+						//let scalingValue = i / 5;
+						//object.scale.set(scalingValue, scalingValue, scalingValue);
+						heart.add(object);
+					}
+				}
+
+				pivot.add( heart );
 				scene.add( pivot );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
