@@ -68,7 +68,7 @@
 			const borderLimits = 10;
 
 			var camera, scene, renderer, controls, stats;
-			var pivot, terrain, heart;
+			var pivot, terrain, heart, column;
 			var img;
 
 			var objects = [];
@@ -114,16 +114,30 @@
  				var light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 0.1 );
 				light.position.set( 0, 1, 0 );
 
-				var spotLight = new THREE.SpotLight( 0xaa5599 );
+				var spotLight = new THREE.SpotLight( 0x333333 );
 				spotLight.intensity = 2;	
 				spotLight.distance = 300;
-				spotLight.position.set(100, 30, 10);
+				spotLight.position.set(100, 30, -10);
 				spotLight.castShadow = true;
 				spotLight.shadow.mapSize.width = 1024;
 				spotLight.shadow.mapSize.height = 1024;
 				spotLight.shadow.camera.near = 500;
 				spotLight.shadow.camera.far = 4000;
 				spotLight.shadow.camera.fov = 30;
+
+				var spotLight1 = new THREE.SpotLight(0xd966ff);
+				spotLight1.intensity = 2;
+				spotLight1.position.set(-160, 80, -20);
+
+				var spotLight2 = new THREE.SpotLight(0xd966ff);
+				spotLight2.intensity = 2;
+				spotLight2.position.set(160, 80, 20);
+
+				var spotLight3 = new THREE.SpotLight(0xd966ff);
+				spotLight3.intensity = 2;
+				spotLight3.position.set(-160, 80, 20);
+				
+				
 /*
 				var pointLight1 = new THREE.PointLight( 0xaaaaff );
 				pointLight1.position.set(0, 20, 0);
@@ -132,10 +146,11 @@
 				pointLight2.position.set(10, 30, -5);
 
 				var pointLight3 = new THREE.PointLight( 0xaaaaff );
-				pointLight3.position.set(-20, 20, 14);*/
+				pointLight3.position.set(-20, 20, 14);
 
-				//scene.add( light, spotLight, pointLight1, pointLight2, pointLight3 ); 
-				scene.add(light, spotLight);
+				scene.add( light, spotLight, pointLight1, pointLight2, pointLight3 ); 
+				*/
+				scene.add(light, spotLight, spotLight1, spotLight2, spotLight3);
 				controls = new THREE.PointerLockControls( camera );
 
 				// Instructions
@@ -250,7 +265,7 @@
 
 				// heart
 				var heartMaterial = new THREE.MeshPhysicalMaterial({
-					emissive: 0xff22aa,
+					//emissive: 0xff22aa,
 					metalness: 0.0,
 					roughness: 0.15,
 					opacity: 0.8,
@@ -276,13 +291,39 @@
 					heart.add(object);
 				}
 
+				var columnMaterial = new THREE.MeshPhysicalMaterial({
+					metalness: 0.0,
+					roughness: 0.15,
+					opacity: 0.8,
+					side: THREE.FrontSide,
+					transparent: false,
+					map: crystalTexture,
+					envMap: crystalTexture
+				});
+
+				//colonna
+				column = new THREE.Object3D();
+				box = new THREE.Mesh(boxGeometry, columnMaterial);
+				box.position.y = 0;
+				box.position.x = 0;
+				box.name = "column";
+
+				for(var i = 1; i < 100*2; i++){
+					let object = box.clone();
+					object.position.x = Math.sin(i)* 8;
+					object.position.y += i;
+					object.position.z = Math.cos(i)* 8; 
+					object.scale.set(0.6, 0.6, 0.6);
+					column.add(object);
+				}
+
 
 				// lights
-				var mainLight = new THREE.PointLight( 0xcccccc, 1.5, 250 );
+				/* var mainLight = new THREE.PointLight( 0xcccccc, 1.5, 250 );
 				mainLight.position.y = 20;
 				mainLight.intensity = 0.8;
-				heart.add( mainLight );
-
+				heart.add( mainLight ); */
+				pivot.add(column);
 				pivot.add( heart );
 				scene.add( pivot );
 
