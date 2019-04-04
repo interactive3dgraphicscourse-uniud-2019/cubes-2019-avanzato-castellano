@@ -68,7 +68,7 @@
 			const borderLimits = 10;
 
 			var camera, scene, renderer, controls, stats;
-			var pivot, terrain, heart, column;
+			var pivot, terrain, stairs, globe;
 			var img;
 
 			var objects = [];
@@ -136,21 +136,9 @@
 				var spotLight3 = new THREE.SpotLight(0xd966ff);
 				spotLight3.intensity = 2;
 				spotLight3.position.set(-160, 80, 20);
-				
-				
-/*
-				var pointLight1 = new THREE.PointLight( 0xaaaaff );
-				pointLight1.position.set(0, 20, 0);
 
-				var pointLight2 = new THREE.PointLight( 0xaaaaff );
-				pointLight2.position.set(10, 30, -5);
-
-				var pointLight3 = new THREE.PointLight( 0xaaaaff );
-				pointLight3.position.set(-20, 20, 14);
-
-				scene.add( light, spotLight, pointLight1, pointLight2, pointLight3 ); 
-				*/
 				scene.add(light, spotLight, spotLight1, spotLight2, spotLight3);
+
 				controls = new THREE.PointerLockControls( camera );
 
 				// Instructions
@@ -263,68 +251,54 @@
 					objects.push( object );
 				}
 
-				// heart
-				var heartMaterial = new THREE.MeshPhysicalMaterial({
-					//emissive: 0xff22aa,
+				// Stairs
+				var stairsMaterial = new THREE.MeshPhysicalMaterial({
 					metalness: 0.0,
 					roughness: 0.15,
-					opacity: 0.8,
 					side: THREE.FrontSide,
 					transparent: false,
 					map: crystalTexture,
 					envMap: crystalTexture
 				});
 				
-				heart = new THREE.Object3D();
-				box = new THREE.Mesh( boxGeometry, heartMaterial );
+				stairs = new THREE.Object3D();
+				box = new THREE.Mesh( boxGeometry, stairsMaterial );
 				box.position.y = 0;
 				box.name = "stairs";
 
-				for (var i = 1; i < 100; i++) {
+				for (var i = 1; i < 90; i++) {
 					let object = box.clone();
 					object.position.y += i * 2; 
-					object.position.x = Math.sin(i/5) * 20;
-					object.position.z = Math.cos(i/5) * 20;
-					object.scale.set(1, 0.2 , 1.5);  
+					object.position.x = Math.sin(i/5) * (100 - i) / 2;
+					object.position.z = Math.cos(i/5) * (100 - i) / 2;
+					let scaleZ = 1.5 - (i / 90);
+					object.scale.set(1, 0.2 , scaleZ);  
 					object.rotation.y = i/5;
 					objects.push(object);
-					heart.add(object);
+					stairs.add(object);
 				}
 
-				var columnMaterial = new THREE.MeshPhysicalMaterial({
-					metalness: 0.0,
-					roughness: 0.15,
-					opacity: 0.8,
-					side: THREE.FrontSide,
-					transparent: false,
+				// Globe
+				var globeMaterial = new THREE.MeshPhysicalMaterial({
+					emissive: 0xffffff,
+					wireframe: true,
+					envMapIntensity: 200,
+					envMap: crystalTexture,
 					map: crystalTexture,
-					envMap: crystalTexture
+					side: THREE.FrontSide,
 				});
+				
+				globe = new THREE.Object3D();
+				box = new THREE.Mesh( boxGeometry, globeMaterial );
+				box.position.y = 220;
+				box.name = "globe";
+				box.rotation.x = 45 * deg;
+				box.rotation.z = 45 * deg;
+				box.scale.set(2, 2, 2);
+				globe.add(box);
 
-				//colonna
-				column = new THREE.Object3D();
-				box = new THREE.Mesh(boxGeometry, columnMaterial);
-				box.position.y = 0;
-				box.position.x = 0;
-				box.name = "column";
-
-				for(var i = 1; i < 100*2; i++){
-					let object = box.clone();
-					object.position.x = Math.sin(i)* 8;
-					object.position.y += i;
-					object.position.z = Math.cos(i)* 8; 
-					object.scale.set(0.6, 0.6, 0.6);
-					column.add(object);
-				}
-
-
-				// lights
-				/* var mainLight = new THREE.PointLight( 0xcccccc, 1.5, 250 );
-				mainLight.position.y = 20;
-				mainLight.intensity = 0.8;
-				heart.add( mainLight ); */
-				pivot.add(column);
-				pivot.add( heart );
+				scene.add( stairs );
+				scene.add( globe );
 				scene.add( pivot );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -376,6 +350,7 @@
 					}
 
 					scene.add(terrain);
+
 				}
 
 				/*
@@ -503,6 +478,7 @@
 				var timer = Date.now() * 0.001;
 
 				pivot.rotateY(0.1 * deg);
+				globe.rotateY(-0.1 * deg);
 
 				objects.map((obj) => {
 					if (obj.name != "terrain" && obj.name != "stairs") {
