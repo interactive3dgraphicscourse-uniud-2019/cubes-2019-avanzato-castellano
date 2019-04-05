@@ -1,4 +1,4 @@
-# Diario
+﻿# Diario
 
 ## 2019-03-26
 
@@ -55,11 +55,17 @@
 
 ## 2019-04-02
 
-- Creazione degli scalini 
-- Valutazione delle luci nella scena
-  - Applicazione e modifiche delle luci utilizzate. Per questioni di visulizzazioni ed atmosfera si è optato per utilizzare gli SpotLight al posto dei PointLight (usati in precedenza).
+- Aggiunte alla scena
+
+	- Creazione degli scalini 
+	- Valutazione delle luci nella scena. Per questioni di visulizzazioni ed atmosfera si è optato per utilizzare gli SpotLight al posto dei PointLight (usati in precedenza).
 
 ## 2019-04-03
 
-- Creazione della colonna interna 
-- Modifiche dei colori degli SpotLight per avere un effetto più "grottesco" e della scala
+- Messe a punto
+
+	- Modifiche dei colori degli SpotLight e della scala per avere un effetto più soffuso.
+	- Modificato la scala per renderla a spirale, ed ogni gradino scalato in base alla sua altezza.
+
+![spirale](screenshots/4.png)
+![scala](screenshots/3.png)
