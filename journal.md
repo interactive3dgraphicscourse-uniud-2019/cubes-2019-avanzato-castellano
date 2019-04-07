@@ -62,10 +62,25 @@
 
 ## 2019-04-03
 
+- Creazione della colonna interna che supporta gli scalini
 - Messe a punto
-
-	- Modifiche dei colori degli SpotLight e della scala per avere un effetto più soffuso.
-	- Modificato la scala per renderla a spirale, ed ogni gradino scalato in base alla sua altezza.
+  - Modifiche dei colori degli SpotLight e della scala per avere un effetto più soffuso.
+  - Per motivi estetici, si è optato per la cancellazione della colonna e alla modifica della struttura della  scalinata
+  - Modificato la scala per renderla a spirale; inoltre ogni gradino è stato scalato in base alla sua altezza.
+- Aggiunta di un elemento in cima alla scalinata
 
 ![spirale](screenshots/4.png)
 ![scala](screenshots/3.png)
+
+
+
+## 2019-04-05
+
+- Modifiche dell'oggetto all'inizio della scala. Si è optato per la creazione di un cubo fermo formato da più cubi ruotati tra loro sempre in wireframe.
+
+- Sono stati aggiunti, inoltre, una serie di piccoli cubi in wireframe che ruotano attorno al cubo principale.
+
+- Incorporato il suono alla scena.
+
+  ![imgfinale](C:\Users\Astrid\Documents\UNI\Interactive Graphics 3D\GITHUB_RANON\cubes-2019-avanzato-castellano\screenshots\6.png)
+

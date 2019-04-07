@@ -1,6 +1,8 @@
-# Modeling and rendering with boxes - Progetto di Avanzato Thomas e Castellano Astrid
+# Modeling and rendering with boxes 
 
-![Immagine dal progetto]()
+Progetto di Avanzato Thomas e Castellano Astrid
+
+![Immagine dal progetto](C:\Users\Astrid\Documents\UNI\Interactive Graphics 3D\GITHUB_RANON\cubes-2019-avanzato-castellano\screenshots\6.png)
 
 ## Pre-requisiti
 
@@ -19,9 +21,9 @@ Un'altro obiettivo da raggiungere è stato quello di disegnare una heightmap in 
 
 Per l'implementazione del progetto siamo partiti guardando e analizzando il codice dato dal docente il partenza. 
 
-Abbiamo deciso di utilizzare come schema base iniziale il file "StartingCode-withLights.html" e poi adattarlo alla nostra scena ideata. 
+Abbiamo deciso di utilizzare come schema base iniziale il file "StartingCode-withLights" e poi adattarlo alla nostra scena ideata. 
 
-Per ricreare il terreno, invece, si siamo basati sul codice "StartingCode-heightmap.html" che ci ha permesso, tramite l'importazione input dell'immagine in scala di grigio nel formato png da noi creata, di produrre un terreno irregolare di diverse altezze.
+Per ricreare il terreno, invece, si siamo basati sul codice "StartingCode-heightmap" che ci ha permesso, tramite l'importazione input dell'immagine in scala di grigio nel formato png da noi creata, di produrre un terreno irregolare di diverse altezze.
 
 ## Steps 
 
@@ -29,24 +31,25 @@ Per ricreare il terreno, invece, si siamo basati sul codice "StartingCode-height
 2. Abbiamo analizzato e compreso i file di codice che ci ha fornito il docente come base di partenza e valutato come appocciarci al problema.
 3. Abbiamo aggiunto alla nostra repository il nostro diario "journal.md", nel quale ogni volta in cui sono state apportate modifiche o aggiunte è stato scritto un commento con la relativa data.
 4. Prima di iniziare l'implementazione, abbiamo raccolto le idee per l'ambientazione e utilizzato l'[editor](https://threejs.org/editor/) di Three.js per ricrearla andando a modificare le luci e le proprietà dei cubi. Abbiamo fatto delle ricerche, inoltre, per la valutazione della fattibilità su codice già pre-esistente online.
-5. Dopo aver scelto quale idea implementare, abbiamo iniziato il lavoro creando n cubi fluttuanti che ruotano attorno ad un perno, detto "pivot". Abbiamo inoltre iniziato ad implementare i materiali da applicare agli oggetti volanti e le luci alla scena.
+5. Dopo aver scelto quale idea implementare, abbiamo iniziato il lavoro creando n cubi fluttuanti che ruotano attorno ad un perno, detto "pivot". Abbiamo inoltre iniziato ad implementare i materiali da applicare agli oggetti volanti e le luci alla scena e abbiamo aggiunto un effetto "foschia" alla scena tramite la funzione di Three.js "Fog()".
 6. Prima dell'aggiunta di altri oggetti nella scena, sono state aggiunte le interazioni con l'utente e sono stati testati i comandi. 
    Per l'implementazione del codice, abbiamo cercato e consultato la dispensa della [documentazione online di threejs](<https://threejs.org/docs/index.html#api/en/core/EventDispatcher>).
-7. Successivamente abbiamo creato il terreno utilizzando il codice di partenza "StartingCode-heightmap.html". 
+7. Successivamente abbiamo creato il terreno utilizzando il codice di partenza "StartingCode-heightmap". 
    Abbiamo creato tramite l'utilizzo del programma Photoshop, un immagine (30x30) a scala di grigio in png da passare in input al codice [vedi il sottocapitolo "Terreno"].
-   Sono state implementate anche le direttive per il meccanismo di limitazione della mappa, tramite il quale l'utente utilizzando i tasti non può uscire dal terreno della scena.
+   Sono state implementate anche le direttive per il meccanismo di limitazione della mappa, tramite il quale l'utente utilizzando i tasti non può uscire dalla planimetria.
 8. In seguito, abbiamo creato un oggetto fatto di cubi. 
    In centro alla scena abbiamo disegnato una scala avviluppata su se stessa composta solo da scalini. 
    Ogni scalino in base alla sua posizione (altezza rispetto alla scena) è scalato proporzionalmente in modo da creare un effetto ottico.
-9. In cima alla scala sono stati creati ....????????????????????????
+9. In cima alla scala sono stati creati, un cubo fermo in wireframe composto da più cubi ruotati e una serie di piccoli cubi (sempre in wireframe) che ruotano attorno ad esso.
+10. Infine, come ultima miglioria è stato implementato il suono per rendere l'atmosfera più misteriosa-magica.
 
 ### Materiali
 
 I materiali utilizzati in questo progetto sono:
 
-- [MeshPhysicalMaterial]()
-- [MeshBasicMaterial]()
-- [MeshPhongMaterial]()
+- [MeshPhysicalMaterial](<http://www.inf.u-szeged.hu/~tanacs/threejs/docs/#api/en/materials/MeshPhysicalMaterial>)
+- [MeshBasicMaterial](<http://www.inf.u-szeged.hu/~tanacs/threejs/docs/#api/en/materials/MeshBasicMaterial>)
+- [MeshPhongMaterial](<http://www.inf.u-szeged.hu/~tanacs/threejs/docs/#api/en/materials/MeshPhongMaterial>)
 
 #### Cubi
 
@@ -67,7 +70,7 @@ Essi sono delle MeshPhysicalMaterial con le proprietà:
 
 - PremultipliedAlpha = true
 
-- texture = ![crystalTexture](C:\Users\Astrid\Documents\UNI\Interactive Graphics 3D\GITHUB_RANON\cubes-2019-avanzato-castellano\textures\crystal.JPG)
+- Texture = ![crystalTexture](C:\Users\Astrid\Documents\UNI\Interactive Graphics 3D\GITHUB_RANON\cubes-2019-avanzato-castellano\textures\crystal.JPG)
 
 
 #### Terreno
@@ -139,14 +142,9 @@ Per l'immagine heightmap abbiamo creato è un immagine png 30x30 nella scala di 
 
 Il terreno è stato settato nel metodo "setGound()", il quale richiama la funzione appena descritta passandogli l'immagine (heightmap.png) e la scalatura (0.1).
 
-## Animazioni
+### Animazioni
 
 
-## Vincoli
-
-If you use textures, please make sure that you have the rights to include them. For example, search for images that come with a [CC Attribution, ShareAlike or NonCommercial licences](https://creativecommons.org/share-your-work/licensing-types-examples/). 
-
-You are allowed to take inspiration, or create models that reproduce what you see in images on the internet, but copying others' work, even with slight modifications, is forbidden and will have serious consequences beyond the deletion of your project. In any case, mention any source of inspiration in your journal and final report.
 
 ## Aggiunte extra
 
