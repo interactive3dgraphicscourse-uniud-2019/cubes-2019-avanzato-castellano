@@ -1,117 +1,160 @@
-# Modeling and rendering with boxes
+# Modeling and rendering with boxes - Progetto di Avanzato Thomas e Castellano Astrid
 
-![Image from Minecraft](https://jordanweagly.files.wordpress.com/2012/02/figure_4.png)
+![Immagine dal progetto]()
 
-## Prerequisites
+## Pre-requisiti
 
-- read carefully all slides and notes up to lecture 8 before you start. Try the proposed exercises.
-- familiarize with git and github:
-	- [Codecademy’s Learn Git](https://www.codecademy.com/learn/learn-git)
-	- [Git Resources for Visual Learners](https://changelog.com/posts/git-resources-for-visual-learners)
-	- [Introduction to GitHub for Newcomers](https://www.youtube.com/watch?v=uNa9GOtM6NE&feature=youtu.be)
-	- [Github desktop application](https://desktop.github.com)
-- [download three.js r102 and examples](https://github.com/mrdoob/three.js/archive/master.zip)
-
-## Hints
-
-- Try to work out a basic project which satisfies all requirements well before the deadline and as soon as possible: you will then use the remaining time to refine, improve and polish.
-- If you are stuck for too much time on a problem, ask for help, preferably in the forum.
-- the process is as important as the result. Use this project to learn a workflow, and how to use tools effectively. Experiment, and try to come up with efficient, elegant, and well commented code.
-- commit often in your git repository and with meaningful comments. 
+- Letto attentamente la consegna e le linee guida dettate dal docente.
+- Tramite gli opportuni link consigliati, abbiamo appreso come muoverci su GitHub, abbiamo inoltre creato il gruppo per il progetto e clonato la repository.
+- Prima di iniziare a programmare, abbiamo raccolto le proposte e pensato che scena ricreare.
 
 ## Goals 
-In this project you'll first create an interesting scene of your own design, made up just of boxes. The boxes can be
-translated, scaled and rotated as you wish. For inspiration, look at [Minecraft](https://minecraft.net/en-us/), 
-Legos, and voxel-based games such as [Crossy Road](http://www.crossyroad.com).
+In questo progetto è stata creata un'ambientazione fatta di soli cubi, che sono stati traslati, scalati e ruotati.
 
-I am not expecting something highly complex, but I expect something **interesting** and that you use **at least 30 boxes**.
+La consegna prevedeva di aggiungere delle animazioni che son state implementate per far ruotare e spostare i cubi fluttuanti e l'interazione con l'utente tramite i comandi da tastiera e mouse. Di creare, inoltre, un oggetto fatto interamente di cubi con il quale abbiamo ideato una scala a chiocciola con la base più grande ripetto alla cima e scalato in proporzione all'altezza e alla posizione gli scalini.
 
-In addition, provide your model with a simple but meaningful animation. To do this, you'll have to structure the scene
-graph in a convenient way. The animation can continuosly play itself, or can be controlled by the user through UI controls.
-
-After creating a scene, you have a choice:
-
-- if you are more interested in programming, you can choose to create a terrain for your scene, using a heightmap in the
-form of a greyscale image as input;
-- alternatively, you can choose to create a short movie that presents your scene.
-
-In either case, see the next sections for more detailed instructions and suggestions. You are also required to document your
-work and write a final report, as detailed below. 
+Un'altro obiettivo da raggiungere è stato quello di disegnare una heightmap in forma di immagine in scala di grigi per lo sviluppo irregolare del terreno della scena.
 
 ## Starting code
 
-I have provided two starting scenes, one without lights and textures, and one which includes a basic lighting setup 
-and an example of texture usage. Your final result should be obtained by modifiying ONE of these files. 
+Per l'implementazione del progetto siamo partiti guardando e analizzando il codice dato dal docente il partenza. 
 
-Choose the one you prefer based on the kind of result you want to obtain, and how much you want to experiment with features we haven't yet explained in our lectures. You are free to do any modifications, including replacing my code, e.g. to use an orthographic camera instead of a perspective one.
+Abbiamo deciso di utilizzare come schema base iniziale il file "StartingCode-withLights.html" e poi adattarlo alla nostra scena ideata. 
 
-For the box materials, without lights you can use MeshBasicMaterial for solid, textured, or wireframe rendering. 
-
-When using lights, it is better to use MeshPhongMaterial for the boxes. The example also includes some code to render shadows; if you like the effect, you'll need to write similar code for all the boxes you will insert, or you can remove it entirely for rendering without shadows.
-
-The third starting code file is necessary only if you choose to create a terrain. It loads a *m by n* PNG image from a file and builds an array of *m x n* values where each value is a greyscale value in the range 0-255. The code assumes that the image is composed by four channels (RGBA) and the value of the three RGB channel is the same. If you use another kind of image, you will have to modify the code accordingly.
+Per ricreare il terreno, invece, si siamo basati sul codice "StartingCode-heightmap.html" che ci ha permesso, tramite l'importazione input dell'immagine in scala di grigio nel formato png da noi creata, di produrre un terreno irregolare di diverse altezze.
 
 ## Steps 
 
-1. clone the starting code in the repository.
-2. examine the starting code carefully. In the case of the code which uses lights, we are using stuff that has not been explained in the course yet. However, with some help from the [three.js documentation](https://threejs.org/docs/index.html#Manual/Introduction/Creating_a_scene), it should not be too hard to figure out what each line does. Try to play with the code and modify values, and gain some understanding by observing the result of your changes. Often, we don't need to fully understand how code really function, or the underlying theory.
-3. Prepare, and add to the repository, a journal.md file for logging your progress and choices.
-3. design and implement your scene. Here, you can choose between different methods; it is a good exercise to try a couple of different alternatives (however, this is not mandatory)
-	- design your scene on graphed paper, deriving, for each box, the necessary translation, rotation, and scaling values. Then, you can directly code the scene in three.js
-	- prototype your scene in Unity. Placing, rotating, and scaling grey boxes is straightforward, as we showed in classroom. You can change the color
-	or texture of a box by: (i) creating a new material; (ii) assigning the material to the box; (iii) changing, in the inspector, the material albedo color or texture. See the [Unity documentation for these operations](https://docs.unity3d.com/Manual/Materials.html). You can then reproduce the scene in three.js.
-	- directly create your scene using the [three.js editor](https://threejs.org/editor/). In this case, you can use the "scene export" function to directly export the scene in the json-based three.js scene format. Once the result is saved as text file, it should be possible to load it into three.js using the (deprecated) SceneLoader or the new ObjectLoader. I write "it should be possible" because it is not entirely clear if and which of the two will work. So, in theory this solution requires the least amount of work; in practice, it will probably require you to dig into three.js code and maybe spend a few minutes googling for answers to problems. This is quite common with complex, continuously developed code such as three.js and game engines. You will always find bugs, poorly documented features or outdated examples. Learning how to cope with this situations, how to search and ask for help, e.g. on AnswerHub is an important skill than any developer should acquire.
-4. design and implement an animation. Aim for simple animations that can be expressed by a few translations or rotations, or that can be programmed through simple mathematical relations or even physics equations (like Kinematic equations). You might need to introduce nodes (Object3D) in your scene graph to make the animations easier to implement. As with several examples that we have seen, you can make the animation user-controllable by using [dat.gui] (https://github.com/dataarts/dat.gui). Look in three.js examples for how to connect the GUI controls to your scene.
-5. At this point, you need to choose whether to add a terrain or create a short movie. These alternative steps are explained below.
-6. Create a report of your work by the due deadline.
+1. Abbiamo clonato il progetto di partenza della repository "Progetto" del docente.
+2. Abbiamo analizzato e compreso i file di codice che ci ha fornito il docente come base di partenza e valutato come appocciarci al problema.
+3. Abbiamo aggiunto alla nostra repository il nostro diario "journal.md", nel quale ogni volta in cui sono state apportate modifiche o aggiunte è stato scritto un commento con la relativa data.
+4. Prima di iniziare l'implementazione, abbiamo raccolto le idee per l'ambientazione e utilizzato l'[editor](https://threejs.org/editor/) di Three.js per ricrearla andando a modificare le luci e le proprietà dei cubi. Abbiamo fatto delle ricerche, inoltre, per la valutazione della fattibilità su codice già pre-esistente online.
+5. Dopo aver scelto quale idea implementare, abbiamo iniziato il lavoro creando n cubi fluttuanti che ruotano attorno ad un perno, detto "pivot". Abbiamo inoltre iniziato ad implementare i materiali da applicare agli oggetti volanti e le luci alla scena.
+6. Prima dell'aggiunta di altri oggetti nella scena, sono state aggiunte le interazioni con l'utente e sono stati testati i comandi. 
+   Per l'implementazione del codice, abbiamo cercato e consultato la dispensa della [documentazione online di threejs](<https://threejs.org/docs/index.html#api/en/core/EventDispatcher>).
+7. Successivamente abbiamo creato il terreno utilizzando il codice di partenza "StartingCode-heightmap.html". 
+   Abbiamo creato tramite l'utilizzo del programma Photoshop, un immagine (30x30) a scala di grigio in png da passare in input al codice [vedi il sottocapitolo "Terreno"].
+   Sono state implementate anche le direttive per il meccanismo di limitazione della mappa, tramite il quale l'utente utilizzando i tasti non può uscire dal terreno della scena.
+8. In seguito, abbiamo creato un oggetto fatto di cubi. 
+   In centro alla scena abbiamo disegnato una scala avviluppata su se stessa composta solo da scalini. 
+   Ogni scalino in base alla sua posizione (altezza rispetto alla scena) è scalato proporzionalmente in modo da creare un effetto ottico.
+9. In cima alla scala sono stati creati ....????????????????????????
 
-### Adding a terrain
+### Materiali
 
-The code in StartingCode-heightmap loads a greyscale image from a file and creates and array of the same m x n size of the image, where the value in each cell ranges from 1 (black) to 63,75 (white). 
-Write a function that takes this array, and creates a grid of boxes on the XZ plane, where the scaling and translation in Y for each box is proportional to the value read in the array, meaning that you should choose a proportionality factor that makes the terrain look good. In other words, you are treating the image as an **heightmap**, where the greyscale value corresponds to the height of the corresponding point. 
+I materiali utilizzati in questo progetto sono:
 
-You can also choose the box color or texture based on the heightmap value, e.g. white color for high values (snow), grey color for medium values (rocks), green color for lower values (grass), but this is just an example.
+- [MeshPhysicalMaterial]()
+- [MeshBasicMaterial]()
+- [MeshPhongMaterial]()
 
-### Creating a short movie
+#### Cubi
 
-Remove the code for orbiting the camera with the mouse and plan camera movements (e.g., pan, arcing, traveling) and cuts. In the Update function, using the Date.now() Javascript function (that returns the number of milliseconds elapsed since 1 January 1970 00:00:00 UTC) you can check how much time is passed since the application started and then activate the correct camera animation.
+I materiali per i cubi fluttuanti sono stati implementati nella variabile "boxMaterial". 
+Essi sono delle MeshPhysicalMaterial con le proprietà:
 
-For producing the movie, you can use some screen capture application, and then, if you want, you can use video editing software to apply post effects, transitions, and color correction.	
+- Colore = 0x0000ff
 
-## Documenting and report
+- Metallo = 0.5
 
-For project documentation and reporting, we use the [markdown format](https://daringfireball.net/projects/markdown/syntax), which is also the format of this document. Markdown is a lightweight markup language with plain text formatting syntax which is easy and quick to write, very human-readable, and that can be converted to HTML.
+- Rugosità = 0.15
 
-If you need more features than the ones that markdown provides (e.g. writing equations), you can use one of its extensions called [markdeep](https://casual-effects.com/markdeep/). For this project, however, markdown shoud be enough.  
+- Trasparente con opacità 0.15
 
-You are required to document your project in two ways:
+- Riempimento FrontSide
 
-- maintain a journal (in a file called journal.md) describing key design decisions, changes, bug symptoms and solutions, including screenshots.
-- create a report (in the readme.md file).
+- Intensità della texture = 5
 
-The report should be as brief as possible while covering the following points:
+- PremultipliedAlpha = true
 
-- overall description: what your project is about and the files it uses.
-- results, including images of the scenes created, taken in a way that clearly illustrates that they satisfy the specification.
-- brief explanation of the process that you used to make your scene. Include tools, assets, and planning steps.
+- texture = ![crystalTexture](C:\Users\Astrid\Documents\UNI\Interactive Graphics 3D\GITHUB_RANON\cubes-2019-avanzato-castellano\textures\crystal.JPG)
 
-## Constraints
+
+#### Terreno
+
+Il materiale utilizzato per il terreno "groundMaterial" è una MeshPhysicalMaterial con le seguenti proprietà:
+
+- Riflettività = 1
+- Colore =  0xbbaaf0
+- Metallo = 1
+- Rugosità = 0.5 
+- Trasparenza con opacità di 0.9
+- Riempimento FrontSide
+- Texture = ![groundTexture](C:\Users\Astrid\Documents\UNI\Interactive Graphics 3D\GITHUB_RANON\cubes-2019-avanzato-castellano\textures\rock.jpg)
+
+#### Scala
+
+Anche le scale sono dello stesso tipo di materiale dei, ovvero MeshPhysicalMaterial in modo da poterci salire.
+
+Le sue proprietà a differenza dei cubi sono:
+
+- Niente trasparenza
+
+- Metallo = 0
+
+- Texture = ![crystalTexture](C:\Users\Astrid\Documents\UNI\Interactive Graphics 3D\GITHUB_RANON\cubes-2019-avanzato-castellano\textures\crystal.JPG)
+
+#### Globo
+
+?????????????
+
+#### Anello 
+
+?????????????????
+
+### Luci
+
+Per il nostro ambiente, abbiamo utilizzato:
+
+- una "[HemisphereLight](<https://threejs.org/docs/index.html#api/en/lights/HemisphereLight>)", chiamata "light" per l'illuminazione posizionata in centro alla scena nelle coordinate (0, 1, 0) con attributi: 
+
+  - 0xeeeeff: colore del cielo
+  - 0x777788: colore del terreno
+  - 0.1: valore dell'intensità della luce sprigionata
+
+- quattro "[SpotLight](<https://threejs.org/docs/index.html#api/en/lights/SpotLight>)", chiamati "spotLight1, spotLight2, spotLight3, spotLight4" per ricreare un illuminazione emessa come fascio di luce da una singola direzione.
+  Hanno tutte e quattro l'intensità pari al valore 2.
+  - spotLight1 è posta nella posizione con coordinate (100, 30, -10) che sprigina il colore 0x333333. 
+    Ha inoltre la proprietà di emettere le ombre con i relativi settaggi della camera:
+    - Aspetto della mapSize con le relative ombre in altezza e larghezza:
+      spotLight1.shadow.mapSize.width = 1024;
+      spotLight1.shadow.mapSize.height = 1024;
+    - Piano di ritaglio vicino alla camera:
+      spotLight1.shadow.camera.near = 500;
+    - Piano di ritaglio lontano dalla camera: 
+      spotLight1.shadow.camera.far = 4000;
+    - Settaggio dell'angolo:
+      spotLight1.shadow.camera.fov = 30;
+  - spotLight2 è posta nelle coordinate (-160, 80, -20) con corrispondenza opposta troviamo spotLight3 con coordinate (160, 80, 20) e infine spotLight4 in coordinate (-160, 80, 20). 
+    Queste tre luci emettono la tonalità 0xd966ff.
+
+
+### Terreno
+
+Per la creazione del terreno è stato utilizzato il codice di partenza dato dal docente "StartingCode-heightmap", in particolar modo il metodo "getHeightData()" al quale vengono passati in input l'immagine heightmap e la scala e ritorna in output un array "data" contenente le altezze.
+
+Per l'immagine heightmap abbiamo creato è un immagine png 30x30 nella scala di grigio. 
+
+![heightmap_img](C:\Users\Astrid\Documents\UNI\Interactive Graphics 3D\GITHUB_RANON\cubes-2019-avanzato-castellano\textures\heightmap.png)
+
+Il terreno è stato settato nel metodo "setGound()", il quale richiama la funzione appena descritta passandogli l'immagine (heightmap.png) e la scalatura (0.1).
+
+## Animazioni
+
+
+## Vincoli
 
 If you use textures, please make sure that you have the rights to include them. For example, search for images that come with a [CC Attribution, ShareAlike or NonCommercial licences](https://creativecommons.org/share-your-work/licensing-types-examples/). 
 
 You are allowed to take inspiration, or create models that reproduce what you see in images on the internet, but copying others' work, even with slight modifications, is forbidden and will have serious consequences beyond the deletion of your project. In any case, mention any source of inspiration in your journal and final report.
 
-## Follow-up
+## Aggiunte extra
 
-You are welcome to extend your project after the deadline, in any way your think is interesting. For example, you could add javascript libraries that analyze music and derive values in real-time that can be fed to three.js for animation purposes, or you could extend your terrain generation software such that hidden box faces are not created in three.js. If you do that before the final exam, you might get bonus points for this kind of activies - just let me know any progress you make.
+Come aggiunta finale, si è voluto inserire una traccia audio. 
 
-## Credits
+Per la comprensione dell'utilizzo ci siamo basati sulla documentazione online di three.js sulle tecniche di audio: [AudioLoader](<https://threejs.org/docs/index.html#api/en/loaders/AudioLoader>) e [AudioListener](<https://threejs.org/docs/index.html#api/en/audio/AudioListener>)
 
-This project is inspired by the [Cubes Graphics Codex Project](http://graphicscodex.com/projects/cubes/index.html) by Morgan McGuire.
+## Supporto
 
-If you like voxels, check out [this three.js-based project](http://voxeljs.com).
-
-## Useful material and references
-
-Sometimes, some feature of the Javascript language can be tricky: [a growing list of quirks](http://bonsaiden.github.io/JavaScript-Garden/)
+Per l'implementazione del codice, ci siamo appoggiati alla guida della [documentazione di three.js](<https://threejs.org/docs/index.html#manual/en/introduction/Creating-a-scene>); all'[three.js editor](https://threejs.org/editor/) per l'implementazione primitiva degli oggetti come prova e studio di fattibilità; al codice di partenza e suggerimenti dati dal docente e al supporto di internet per il reperimento delle immagini, del suono e delle informazioni su errori o chiarimenti del codice.
 
