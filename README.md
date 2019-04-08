@@ -2,6 +2,14 @@
 
 Progetto di Avanzato Thomas e Castellano Astrid
 
+In questo progetto abbiamo voluto ricreare un'ambientazione che avesse un aspetto magico tridimensionale con effetto "grotta". 
+
+All'inizio l'utente si trova esattamente in centro e per salire sul terreno deve saltare una volta (premendo la barra spaziatrice), invece per spostarsi nella scena basta che utilizzi i comandi: w, a, s e d.
+
+Al centro della scena, come lo si può vedere nell'immagine sottostante, è presente una scala a chicciola imponente con al suo apice un oggetto che rende l'idea di un qualcosa di mistico. Nel resto dell'ambientazione ci sono dei cubi trasparenti e riflettenti che ruotano in cerchio attorno ad un punto centrale prefissato.
+
+L'intento è stato quello di inserire pochi elementi per rendere più pulita e fluida l'ambientazione, senza caricarla con troppi oggetti insignificati e inoltre per ricreare il più possibile un'atmosfera magica con pochi tagli soffusi di luci.
+
 ![Immagine dal progetto](C:\Users\Astrid\Documents\UNI\Interactive Graphics 3D\GITHUB_RANON\cubes-2019-avanzato-castellano\screenshots\6.png)
 
 ## Pre-requisiti
@@ -23,7 +31,7 @@ Per l'implementazione del progetto siamo partiti guardando e analizzando il codi
 
 Abbiamo deciso di utilizzare come schema base iniziale il file "StartingCode-withLights" e poi adattarlo alla nostra scena ideata. 
 
-Per ricreare il terreno, invece, si siamo basati sul codice "StartingCode-heightmap" che ci ha permesso, tramite l'importazione input dell'immagine in scala di grigio nel formato png da noi creata, di produrre un terreno irregolare di diverse altezze.
+Per ricreare il terreno, invece, ci siamo basati sul codice "StartingCode-heightmap" che ci ha permesso, tramite l'importazione input dell'immagine da noi creata, di produrre un terreno irregolare di diverse altezze.
 
 ## Steps 
 
@@ -54,7 +62,7 @@ I materiali utilizzati in questo progetto sono:
 #### Cubi
 
 I materiali per i cubi fluttuanti sono stati implementati nella variabile "boxMaterial". 
-Essi sono delle MeshPhysicalMaterial con le proprietà:
+Essi sono delle MeshPhysicalMaterial con le seguenti proprietà:
 
 - Colore = 0x0000ff
 
@@ -87,7 +95,7 @@ Il materiale utilizzato per il terreno "groundMaterial" è una MeshPhysicalMater
 
 #### Scala
 
-Anche le scale sono dello stesso tipo di materiale dei, ovvero MeshPhysicalMaterial in modo da poterci salire.
+Anche le scale sono dello stesso tipo di materiale dei cubi, ovvero MeshPhysicalMaterial. Abbiamo preferito scegliere questo tipo di composizione in modo da poterci salire con l'utente durante la sua interazione.
 
 Le sue proprietà a differenza dei cubi sono:
 
@@ -144,7 +152,20 @@ Il terreno è stato settato nel metodo "setGound()", il quale richiama la funzio
 
 ### Animazioni
 
+Nel progetto, come richiesto negli obiettivi fondamentali da raggiungere, sono state inserite delle animazioni.
 
+#### Rotazione cubi
+
+
+
+#### Comandi utente
+
+
+
+## Problemi riscontrati
+
+Un problema che abbiamo riscontrato e non siamo riusciti a risolvere è che quando l'utente si muove in giro alla planimetria, senza provocare un salto, cade sotto il terreno. 
+Le motivazioni le abbiamo capite ma non siamo risciti ad ottimizzare il codice.
 
 ## Aggiunte extra
 
