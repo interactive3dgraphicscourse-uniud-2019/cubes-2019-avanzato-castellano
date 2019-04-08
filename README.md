@@ -2,15 +2,15 @@
 
 Progetto di Avanzato Thomas e Castellano Astrid
 
-In questo progetto abbiamo voluto ricreare un'ambientazione che avesse un aspetto magico tridimensionale con effetto "grotta". 
+In questo progetto abbiamo voluto ricreare un'ambientazione che avesse un aspetto magico tridimensionale ad effetto "grotta". 
 
 All'inizio l'utente si trova esattamente in centro e per salire sul terreno deve saltare una volta (premendo la barra spaziatrice), invece per spostarsi nella scena basta che utilizzi i comandi: w, a, s e d.
 
-Al centro della scena, come lo si può vedere nell'immagine sottostante, è presente una scala a chicciola imponente con al suo apice un oggetto che rende l'idea di un qualcosa di mistico. Nel resto dell'ambientazione ci sono dei cubi trasparenti e riflettenti che ruotano in cerchio attorno ad un punto centrale prefissato.
+Al centro della scena, come lo si può vedere nell'immagine sottostante, è presente una scala a chicciola imponente con al suo apice un oggetto "Globe" che rende l'idea di un qualcosa di mistico. Nel resto dell'ambientazione ci sono dei cubi trasparenti e riflettenti che ruotano in cerchio attorno ad un punto centrale prefissato.
 
-L'intento è stato quello di inserire pochi elementi per rendere più pulita e fluida l'ambientazione, senza caricarla con troppi oggetti insignificati e inoltre per ricreare il più possibile un'atmosfera magica con pochi tagli soffusi di luci.
+Abbiamo preferito lavorare sull'effetto scenografico rispetto alla complessita della composizione della scena. Infatti, abbiamo inserito pochi elementi per renderla più pulita e per focalizzare l'attenzione dell'utente sull'atmosfera.
 
-![Immagine dal progetto](C:\Users\Astrid\Documents\UNI\Interactive Graphics 3D\GITHUB_RANON\cubes-2019-avanzato-castellano\screenshots\6.png)
+![Immagine dal progetto](screenshots\6.png)
 
 ## Pre-requisiti
 
@@ -39,8 +39,9 @@ Per ricreare il terreno, invece, ci siamo basati sul codice "StartingCode-height
 2. Abbiamo analizzato e compreso i file di codice che ci ha fornito il docente come base di partenza e valutato come appocciarci al problema.
 3. Abbiamo aggiunto alla nostra repository il nostro diario "journal.md", nel quale ogni volta in cui sono state apportate modifiche o aggiunte è stato scritto un commento con la relativa data.
 4. Prima di iniziare l'implementazione, abbiamo raccolto le idee per l'ambientazione e utilizzato l'[editor](https://threejs.org/editor/) di Three.js per ricrearla andando a modificare le luci e le proprietà dei cubi. Abbiamo fatto delle ricerche, inoltre, per la valutazione della fattibilità su codice già pre-esistente online.
+   Ci siamo informati sulle proprietà degli oggetti non viste a lezione come la rifrazione, la riflessione e le simulazioni fisiche dei materiali.
 5. Dopo aver scelto quale idea implementare, abbiamo iniziato il lavoro creando n cubi fluttuanti che ruotano attorno ad un perno, detto "pivot". Abbiamo inoltre iniziato ad implementare i materiali da applicare agli oggetti volanti e le luci alla scena e abbiamo aggiunto un effetto "foschia" alla scena tramite la funzione di Three.js "Fog()".
-6. Prima dell'aggiunta di altri oggetti nella scena, sono state aggiunte le interazioni con l'utente e sono stati testati i comandi. 
+6. Prima dell'implementazione di altri oggetti nella scena, sono state aggiunte le interazioni con l'utente e sono stati testati i comandi. 
    Per l'implementazione del codice, abbiamo cercato e consultato la dispensa della [documentazione online di threejs](<https://threejs.org/docs/index.html#api/en/core/EventDispatcher>).
 7. Successivamente abbiamo creato il terreno utilizzando il codice di partenza "StartingCode-heightmap". 
    Abbiamo creato tramite l'utilizzo del programma Photoshop, un immagine (30x30) a scala di grigio in png da passare in input al codice [vedi il sottocapitolo "Terreno"].
@@ -55,63 +56,86 @@ Per ricreare il terreno, invece, ci siamo basati sul codice "StartingCode-height
 
 I materiali utilizzati in questo progetto sono:
 
-- [MeshPhysicalMaterial](<http://www.inf.u-szeged.hu/~tanacs/threejs/docs/#api/en/materials/MeshPhysicalMaterial>)
-- [MeshBasicMaterial](<http://www.inf.u-szeged.hu/~tanacs/threejs/docs/#api/en/materials/MeshBasicMaterial>)
-- [MeshPhongMaterial](<http://www.inf.u-szeged.hu/~tanacs/threejs/docs/#api/en/materials/MeshPhongMaterial>)
+- [MeshPhysicalMaterial](<http://www.inf.u-szeged.hu/~tanacs/threejs/docs/#api/en/materials/MeshPhysicalMaterial>) utilizzato per gli elementi con cui l'utente può intragire "saltandoci sopra", grazie ad un sisitema di controllo collisione, fornito nell'esempio di [PointerLockControls](https://threejs.org/examples/?q=controls#misc_controls_pointerlock).
+  Nota: i controlli delle collisioni vengono effettuati solo per gli oggetti contenuti nell'array "objects".
+- [MeshBasicMaterial](<http://www.inf.u-szeged.hu/~tanacs/threejs/docs/#api/en/materials/MeshBasicMaterial>) utilizzato per i cubi in wireframe.
 
 #### Cubi
 
 I materiali per i cubi fluttuanti sono stati implementati nella variabile "boxMaterial". 
 Essi sono delle MeshPhysicalMaterial con le seguenti proprietà:
 
-- Colore = 0x0000ff
+- Colore: 0x0000ff
 
-- Metallo = 0.5
+- Metallo: 0.5
 
-- Rugosità = 0.15
+- Rugosità: 0.15
 
 - Trasparente con opacità 0.15
 
-- Riempimento FrontSide
+- Riempimento: FrontSide
 
-- Intensità della texture = 5
+- Intensità della texture: 5
 
-- PremultipliedAlpha = true
+- PremultipliedAlpha: true
 
-- Texture = ![crystalTexture](C:\Users\Astrid\Documents\UNI\Interactive Graphics 3D\GITHUB_RANON\cubes-2019-avanzato-castellano\textures\crystal.JPG)
+- Texture: 
+
+  ![crystalTexture](textures\crystal.JPG)
 
 
 #### Terreno
 
 Il materiale utilizzato per il terreno "groundMaterial" è una MeshPhysicalMaterial con le seguenti proprietà:
 
-- Riflettività = 1
-- Colore =  0xbbaaf0
-- Metallo = 1
-- Rugosità = 0.5 
+- Riflettività: 1
+
+- Colore:  0xbbaaf0
+
+- Metallo: 1
+
+- Rugosità: 0.5 
+
 - Trasparenza con opacità di 0.9
-- Riempimento FrontSide
-- Texture = ![groundTexture](C:\Users\Astrid\Documents\UNI\Interactive Graphics 3D\GITHUB_RANON\cubes-2019-avanzato-castellano\textures\rock.jpg)
+
+- Riempimento: FrontSide
+
+- Texture:
+
+  ![groundTexture](textures\rock.jpg)
 
 #### Scala
 
-Anche le scale sono dello stesso tipo di materiale dei cubi, ovvero MeshPhysicalMaterial. Abbiamo preferito scegliere questo tipo di composizione in modo da poterci salire con l'utente durante la sua interazione.
+Anche le scale sono dello stesso tipo di materiale dei cubi, ovvero MeshPhysicalMaterial. 
+Abbiamo preferito scegliere questo tipo di composizione in modo da poterci salire con l'utente durante la sua interazione.
 
 Le sue proprietà a differenza dei cubi sono:
 
 - Niente trasparenza
 
-- Metallo = 0
+- Metallo: 0
 
-- Texture = ![crystalTexture](C:\Users\Astrid\Documents\UNI\Interactive Graphics 3D\GITHUB_RANON\cubes-2019-avanzato-castellano\textures\crystal.JPG)
+- Texture:
+
+  ![crystalTexture](textures\crystal.JPG)
 
 #### Globo
 
-?????????????
+L'oggetto "Globo" è composto dal materiale MeshBasicMaterial con proprietà:
+
+- colore: 0xff22aa
+- wireframe: true
+
+Si tratta di una serie di cubi (tre nel nostro caso specifico) ruotati sugli assi X e Z di un valore casuale. 
+La sua posizione è centrale nella scena e si trova all'apice della scalinata, come fosse una reliquia magica conservata nel nostro mondo immaginario.
 
 #### Anello 
 
-?????????????????
+E' una sequenza di 32 cubi in wireframe, scalati in maniera casuale e disposti ad anello attorno al globo centrale. Ogni cubo presenta un displacement casuale rispetto alla circonferenza su cui risiedono.
+
+Anch'essi sono formati dal materiale MeshBasicMaterial, come il "Globo", ma con colore pari a 0x666666.
+
+Il senso di questo anello è focalizzare ulteriormente l'attenzione sul "Globo" e aumentare la percezione di mistero.
 
 ### Luci
 
@@ -125,7 +149,7 @@ Per il nostro ambiente, abbiamo utilizzato:
 
 - quattro "[SpotLight](<https://threejs.org/docs/index.html#api/en/lights/SpotLight>)", chiamati "spotLight1, spotLight2, spotLight3, spotLight4" per ricreare un illuminazione emessa come fascio di luce da una singola direzione.
   Hanno tutte e quattro l'intensità pari al valore 2.
-  - spotLight1 è posta nella posizione con coordinate (100, 30, -10) che sprigina il colore 0x333333. 
+  - spotLight1 è posta nella posizione con coordinate (100, 30, -10) e sprigina il colore 0x333333. 
     Ha inoltre la proprietà di emettere le ombre con i relativi settaggi della camera:
     - Aspetto della mapSize con le relative ombre in altezza e larghezza:
       spotLight1.shadow.mapSize.width = 1024;
@@ -134,7 +158,7 @@ Per il nostro ambiente, abbiamo utilizzato:
       spotLight1.shadow.camera.near = 500;
     - Piano di ritaglio lontano dalla camera: 
       spotLight1.shadow.camera.far = 4000;
-    - Settaggio dell'angolo:
+    - Settaggio dell'angolo verticale:
       spotLight1.shadow.camera.fov = 30;
   - spotLight2 è posta nelle coordinate (-160, 80, -20) con corrispondenza opposta troviamo spotLight3 con coordinate (160, 80, 20) e infine spotLight4 in coordinate (-160, 80, 20). 
     Queste tre luci emettono la tonalità 0xd966ff.
@@ -146,9 +170,15 @@ Per la creazione del terreno è stato utilizzato il codice di partenza dato dal 
 
 Per l'immagine heightmap abbiamo creato è un immagine png 30x30 nella scala di grigio. 
 
-![heightmap_img](C:\Users\Astrid\Documents\UNI\Interactive Graphics 3D\GITHUB_RANON\cubes-2019-avanzato-castellano\textures\heightmap.png)
+![heightmap_img](textures\heightmap.png)
 
-Il terreno è stato settato nel metodo "setGound()", il quale richiama la funzione appena descritta passandogli l'immagine (heightmap.png) e la scalatura (0.1).
+Il terreno è stato impostato nel metodo "setGound()", il quale richiama la funzione appena descritta passandogli l'immagine (heightmap.png) e la scalatura (0.1).
+
+
+
+Abbiamo implementato il codice per il controllo dei limiti della mappa impostando un'area di bordo da cui l'utente non può uscire. 
+
+![bordicodice](screenshots\codice1.PNG)
 
 ### Animazioni
 
@@ -156,22 +186,38 @@ Nel progetto, come richiesto negli obiettivi fondamentali da raggiungere, sono s
 
 #### Rotazione cubi
 
+Le animazioni sui cubi simulano l'assenza di gravità nell'ambientazione; inoltre l'utente può diverirsi a saltarci sopra, essendo un materiale fisico (MeshPhysicalMaterial).
 
+Tramite la rotazione, si ottengono effetti visivi relativi alla riflessione della luce che viene trasmessa dagli SpotLight inseriti e viene riflessa alterandone le qualità grazie alle textures.
+
+La velocità di rivoluzione e rotazione sono state decise per dare un effetto di rallentamento del tempo.
 
 #### Comandi utente
 
+Sono stati inseriti i comandi da testiera per il controllo della camera: 
 
+- "W" || "UP": avanzamento 
+- "A" || "LEFT": traslazione a sinistra
+- "D" || "RIGHT": traslazione a destra
+- "S" || "DOWN": spostamento all'indietro
+- "SPAZIO": salto
+
+Grazie al movimento del mouse, inoltre, è possibile guardarsi attorno (grazie alla rotazione della camera).
+
+I tasti sono rimasti invariati come da codice di partenza reperito nella documentazione di [PointerLockControls](https://threejs.org/examples/?q=controls#misc_controls_pointerlock).
 
 ## Problemi riscontrati
 
-Un problema che abbiamo riscontrato e non siamo riusciti a risolvere è che quando l'utente si muove in giro alla planimetria, senza provocare un salto, cade sotto il terreno. 
-Le motivazioni le abbiamo capite ma non siamo risciti ad ottimizzare il codice.
+Un problema riscontrato e che non siamo riusciti a risolvere è la caduta dell'utente da terreno: quando si muove da un cubo con una certa altezza Y ad un altro con una Y maggiore, la collisione con il terreno non viene catturata e quindi i controlli fanno cadere l'utente sul piano iniziale.
+Questo avviene perchè la superficie di collisione è solamente la faccia superiore del cubo e per risolvere il problema bisognerebbe controllare l'urto con tutte le facce dei cubi.
 
 ## Aggiunte extra
 
 Come aggiunta finale, si è voluto inserire una traccia audio. 
 
-Per la comprensione dell'utilizzo ci siamo basati sulla documentazione online di three.js sulle tecniche di audio: [AudioLoader](<https://threejs.org/docs/index.html#api/en/loaders/AudioLoader>) e [AudioListener](<https://threejs.org/docs/index.html#api/en/audio/AudioListener>)
+Per la comprensione dell'utilizzo ci siamo basati sulla documentazione online di three.js sulle tecniche di audio: [AudioLoader](<https://threejs.org/docs/index.html#api/en/loaders/AudioLoader>) e [AudioListener](<https://threejs.org/docs/index.html#api/en/audio/AudioListener>).
+
+E' stato aggiunto un controllo sulla riproduzione dell'audio per interrompere la traccia quando i controlli sono in pausa.
 
 ## Supporto
 

@@ -283,9 +283,8 @@
 				}
 
 				// Globe
-				var globeMaterial = new THREE.MeshPhongMaterial({
+				var globeMaterial = new THREE.MeshBasicMaterial({
 					color: 0xff22aa,
-					emissive: 0xff22aa,
 					wireframe: true
 				});
 				
@@ -406,7 +405,7 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-
+				// start code from PointerLockControls example in Three.js documentation ------------------
 				if ( controls.isLocked === true ) {
 					raycaster.ray.origin.copy( controls.getObject().position );
 					raycaster.ray.origin.y -= 10;
@@ -441,6 +440,7 @@
 						controls.getObject().position.y = 0;
 						canJump = true;
 					}
+					// end example code ------------------------
 
 					// Terrain limit borders check
 					let z = controls.getObject().position.z;
@@ -488,8 +488,8 @@
 				renderer.render( scene, camera );
 			}
 
-			//method from the StartingCode-heightmap file ---------
-			//return array with height data from img, taken from: http://danni-three.blogspot.it/2013/09/threejs-heightmaps.html
+			// method from the StartingCode-heightmap file ---------
+			// return array with height data from img, taken from: http://danni-three.blogspot.it/2013/09/threejs-heightmaps.html
 			function getHeightData(img,scale) {
 	  
 			 if (scale == undefined) scale=1;
