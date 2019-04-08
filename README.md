@@ -10,7 +10,7 @@ Al centro della scena, come lo si può vedere nell'immagine sottostante, è pres
 
 Abbiamo preferito lavorare sull'effetto scenografico rispetto alla complessita della composizione della scena. Infatti, abbiamo inserito pochi elementi per renderla più pulita e per focalizzare l'attenzione dell'utente sull'atmosfera.
 
-![Immagine dal progetto](screenshots\6.png)
+![Immagine dal progetto](screenshots/6.png)
 
 ## Pre-requisiti
 
@@ -32,6 +32,12 @@ Per l'implementazione del progetto siamo partiti guardando e analizzando il codi
 Abbiamo deciso di utilizzare come schema base iniziale il file "StartingCode-withLights" e poi adattarlo alla nostra scena ideata. 
 
 Per ricreare il terreno, invece, ci siamo basati sul codice "StartingCode-heightmap" che ci ha permesso, tramite l'importazione input dell'immagine da noi creata, di produrre un terreno irregolare di diverse altezze.
+
+## Scene Graph
+
+Dopo aver progettato l'ambiente, l'abbiamo descritto tramite il seguente scene graph.
+
+![scenegraph](screenshots/scenegraph.png)
 
 ## Steps 
 
@@ -81,7 +87,7 @@ Essi sono delle MeshPhysicalMaterial con le seguenti proprietà:
 
 - Texture: 
 
-  ![crystalTexture](textures\crystal.JPG)
+  ![crystalTexture](textures/crystal.JPG)
 
 
 #### Terreno
@@ -102,7 +108,7 @@ Il materiale utilizzato per il terreno "groundMaterial" è una MeshPhysicalMater
 
 - Texture:
 
-  ![groundTexture](textures\rock.jpg)
+  ![groundTexture](textures/rock.jpg)
 
 #### Scala
 
@@ -117,7 +123,7 @@ Le sue proprietà a differenza dei cubi sono:
 
 - Texture:
 
-  ![crystalTexture](textures\crystal.JPG)
+  ![crystalTexture](textures/crystal.JPG)
 
 #### Globo
 
@@ -170,7 +176,7 @@ Per la creazione del terreno è stato utilizzato il codice di partenza dato dal 
 
 Per l'immagine heightmap abbiamo creato è un immagine png 30x30 nella scala di grigio. 
 
-![heightmap_img](textures\heightmap.png)
+![heightmap_img](textures/heightmap.png)
 
 Il terreno è stato impostato nel metodo "setGound()", il quale richiama la funzione appena descritta passandogli l'immagine (heightmap.png) e la scalatura (0.1).
 
@@ -178,7 +184,7 @@ Il terreno è stato impostato nel metodo "setGound()", il quale richiama la funz
 
 Abbiamo implementato il codice per il controllo dei limiti della mappa impostando un'area di bordo da cui l'utente non può uscire. 
 
-![bordicodice](screenshots\codice1.PNG)
+![bordicodice](screenshots/codice1.png)
 
 ### Animazioni
 
