@@ -82,7 +82,7 @@
 
 - Incorporato il suono alla scena.
 
-  ![imgfinale](screenshots\6.png)
+  ![imgfinale](screenshots/6.png)
 
 ## 2019-04-07 
 
